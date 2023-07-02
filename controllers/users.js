@@ -12,7 +12,7 @@ const getUserById = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'we dont have it' });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
@@ -52,7 +52,7 @@ const patchUser = (req, res) => {
       if (!user) {
         return res.status(404).send({ message: 'we dont have it' });
       }
-      res.status(200).send(user);
+      return res.status(200).send(user);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -76,7 +76,7 @@ const patchAvatar = (req, res) => {
       if (!data) {
         return res.status(404).send({ message: 'we dont have it' });
       }
-      res.status(200).send(data);
+      return res.status(200).send(data);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
