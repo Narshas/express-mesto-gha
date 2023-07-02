@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const router = require('express').Router();
 const cardRoutes = require('./cards');
 const userRoutes = require('./users');
