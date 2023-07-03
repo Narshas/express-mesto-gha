@@ -1,6 +1,7 @@
 const User = require('../models/user');
 
-const { ERROR_BAD_REQUEST,
+const {
+  ERROR_BAD_REQUEST,
   ERROR_NOT_FOUND,
   ERROR_DEFAULT,
   OK,

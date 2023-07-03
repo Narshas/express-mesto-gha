@@ -19,7 +19,7 @@
   },
   "homepage": "https://github.com/Narshas/express-mesto-gha#readme",
   "devDependencies": {
-    // "editorconfig": "^1.0.3",
+    "editorconfig": "^1.0.3",
     "eslint": "^8.43.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.27.5",
