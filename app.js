@@ -6,6 +6,8 @@ const router = require('./routes/index');
 
 const { PORT = 3000 } = process.env;
 
+const { ERROR_NOT_FOUND } = require('./errors/errors');
+
 const app = express();
 app.use(express.json());
 
@@ -20,7 +22,7 @@ app.use((req, res, next) => {
 mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(router);
 app.use('/', (req, res) => {
-  res.status(404).send({ message: 'unknown error' });
+  res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
 });
 
 app.listen(PORT, () => {
