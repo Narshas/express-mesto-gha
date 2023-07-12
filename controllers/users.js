@@ -7,6 +7,8 @@ const {
   ERROR_NOT_FOUND,
   ERROR_DEFAULT,
   OK,
+  ERROR_NOTAUTH,
+  CREATED,
 } = require('../errors/errors');
 
 const getUsers = (req, res) => {
@@ -53,11 +55,11 @@ const login = (req, rea, next) => {
   const {email, password} = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token -jwt.sign({_id: user._id}, 'super-secret-key' {expiresIn: '7d'});
-      res.status(OK).send({ _id: token });
+      const token jwt.sign({_id: user._id}, 'super-secret-key', { expiresIn: '7d' });
+      res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
     })
     .catch(() => {
-      throw new ///auth error
+      throw new ///auth error 401
     })
     .catch(next);
 }
@@ -106,6 +108,18 @@ const patchAvatar = (req, res) => {
     });
 };
 
+const getCurrentUser = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if(!user) {
+        res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
+      }
+      res.status(OK).send(user);
+    })
+    .catch(next);
+};
+
+
 module.exports = {
   getUsers,
   getUserById,
@@ -113,4 +127,5 @@ module.exports = {
   patchUser,
   patchAvatar,
   login,
+  getCurrentUser,
 };

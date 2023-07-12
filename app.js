@@ -1,6 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const express = require('express');
+const { celebrate, Joi } = require('celebrate');
 // eslint-disable-next-line import/no-extraneous-dependencies
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const router = require('./routes/index');
 
@@ -24,6 +26,12 @@ app.use(router);
 app.use('/', (req, res) => {
   res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
 });
+
+app.use(cookieParser());
+
+
+// app.post('/signin', login);
+// app.post('/signup', createUser);
 
 app.listen(PORT, () => {
   console.log(`server on port ${PORT}`);
