@@ -1,15 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const router = require('express').Router();
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { celebrate, Joi } = require('celebrate');
-
-const {
-  ERROR_BAD_REQUEST,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
-  OK,
-  ERROR_NOTAUTH,
-  CREATED
-} = require('../errors/errors');
 
 const {
   getUsers,
@@ -24,7 +16,7 @@ const {
 router.get('/users', getUsers);
 router.get(
   '/:userId',
-  celevrate({
+  celebrate({
     params: Joi.object().keys({
       userId: Joi.string().length(24).required(),
     }),
@@ -47,7 +39,7 @@ router.patch(
 
 router.patch(
   'users/me/avatar',
-  celevrate({
+  celebrate({
     body: Joi.object().keys({
       avatar: Joi.string().required().pattern(/(https)?:\/\/(www\.)?[a-z0-9\-._~:/?#[\]@!$&'()*+,;=]{2,}\.[a-z0-9/#?]{2,}$/),
     }),
@@ -55,7 +47,6 @@ router.patch(
   patchAvatar,
 );
 
-router.get('/users/me', getCurrentUser)
+router.get('/users/me', getCurrentUser);
 
 module.exports = router;
-

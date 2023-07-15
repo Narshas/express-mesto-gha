@@ -2,6 +2,7 @@
 const express = require('express');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const cookieParser = require('cookie-parser');
+// eslint-disable-next-line import/no-extraneous-dependencies
 const mongoose = require('mongoose');
 const router = require('./routes/index');
 const auth = require('./middlewares/auth');

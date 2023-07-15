@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
 
 const { ERROR_NOTAUTH } = require('../errors/errors');

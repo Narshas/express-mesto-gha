@@ -1,4 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require('bcrypt');
+// eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
@@ -52,17 +54,17 @@ const createUser = (req, res) => {
 };
 
 const login = (req, res, next) => {
-  const {email, password} = req.body;
+  const { email, password } = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({_id: user._id}, 'super-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({ _id: user._id }, 'super-secret-key', { expiresIn: '7d' });
       res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
     })
     .catch(() => {
       res.status(ERROR_NOTAUTH).send({ message: 'not authorized' });
     })
     .catch(next);
-}
+};
 
 const patchUser = (req, res) => {
   const { name, about } = req.body;
@@ -111,14 +113,13 @@ const patchAvatar = (req, res) => {
 const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      if(!user) {
+      if (!user) {
         res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
       }
       res.status(OK).send(user);
     })
     .catch(next);
 };
-
 
 module.exports = {
   getUsers,
