@@ -4,7 +4,7 @@ const { celebrate, Joi } = require('celebrate');
 const cardRoutes = require('./cards');
 const userRoutes = require('./users');
 const { login, createUser } = require('../controllers/users');
-//const auth
+const auth = require('../middlewares/auth');
 
 const { ERROR_NOT_FOUND } = require('../errors/errors');
 
@@ -35,7 +35,7 @@ router.post(
 
 router.use('/cards', cardRoutes);
 router.use('/users', userRoutes);
-//router.auth
+router.use(auth);
 
 router.use('*', (req, res , next) => {
   res.status(ERROR_NOT_FOUND).send('we dont have it');

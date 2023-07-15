@@ -7,6 +7,7 @@ const {
   OK,
   ERROR_NOTAUTH,
   CREATED,
+  ERROR_CONFLICT,
 } = require('../errors/errors');
 
 const getCards = (req, res) => {
@@ -20,7 +21,7 @@ const createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: _id })
-    .then((card) => res.send(card))
+    .then((card) => res.status(CREATED).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
@@ -33,7 +34,13 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => new Error('Not Found'))
-    .then((card) => res.status(OK).send(card))
+    .then((card) => {
+      if (req.user._id !== card.owner.toString()) {
+        res.status(ERROR_CONFLICT).send({ message: 'not your card' });
+      }
+      card.deleteOne()
+        .then(() => res.status(OK).send({ message: 'card deleted' }));
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });

@@ -4,6 +4,7 @@ const ERROR_DEFAULT = 500;
 const OK = 200;
 const ERROR_NOTAUTH = 401;
 const CREATED = 201;
+const ERROR_CONFLICT = 409;
 
 module.exports = {
   ERROR_BAD_REQUEST,
@@ -12,4 +13,5 @@ module.exports = {
   OK,
   ERROR_NOTAUTH,
   CREATED,
+  ERROR_CONFLICT,
 };
