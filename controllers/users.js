@@ -41,7 +41,7 @@ const createUser = (req, res) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.status(OK).send(user))
+    .then((user) => res.status(CREATED).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
@@ -51,15 +51,15 @@ const createUser = (req, res) => {
     });
 };
 
-const login = (req, rea, next) => {
+const login = (req, res, next) => {
   const {email, password} = req.body;
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token jwt.sign({_id: user._id}, 'super-secret-key', { expiresIn: '7d' });
+      const token = jwt.sign({_id: user._id}, 'super-secret-key', { expiresIn: '7d' });
       res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
     })
     .catch(() => {
-      throw new ///auth error 401
+      res.status(ERROR_NOTAUTH).send({ message: 'not authorized' });
     })
     .catch(next);
 }

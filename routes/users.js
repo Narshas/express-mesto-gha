@@ -49,7 +49,7 @@ router.patch(
   'users/me/avatar',
   celevrate({
     body: Joi.object().keys({
-      avatar: Joi.string().required()..pattern(/(https)?:\/\/(www\.)?[a-z0-9\-._~:/?#[\]@!$&'()*+,;=]{2,}\.[a-z0-9/#?]{2,}$/),
+      avatar: Joi.string().required().pattern(/(https)?:\/\/(www\.)?[a-z0-9\-._~:/?#[\]@!$&'()*+,;=]{2,}\.[a-z0-9/#?]{2,}$/),
     }),
   }),
   patchAvatar,

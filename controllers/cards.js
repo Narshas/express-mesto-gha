@@ -5,7 +5,6 @@ const {
   ERROR_NOT_FOUND,
   ERROR_DEFAULT,
   OK,
-  ERROR_NOTAUTH,
   CREATED,
   ERROR_CONFLICT,
 } = require('../errors/errors');

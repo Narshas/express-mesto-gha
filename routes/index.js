@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const router = require('express').Router();
+// eslint-disable-next-line import/no-extraneous-dependencies
 const { celebrate, Joi } = require('celebrate');
 const cardRoutes = require('./cards');
 const userRoutes = require('./users');
@@ -37,7 +38,7 @@ router.use('/cards', cardRoutes);
 router.use('/users', userRoutes);
 router.use(auth);
 
-router.use('*', (req, res , next) => {
+router.use('*', (req, res, next) => {
   res.status(ERROR_NOT_FOUND).send('we dont have it');
   next();
 });
