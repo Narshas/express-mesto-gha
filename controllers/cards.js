@@ -1,21 +1,20 @@
 const Card = require('../models/card');
+const BadRequestError = require('../errors/error-bad-request');
+const NotFoundError = require('../errors/error-not-found');
+const NotAllowedError = require('../errors/error-not-allowed');
 
 const {
-  ERROR_BAD_REQUEST,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
   OK,
   CREATED,
-  ERROR_CONFLICT,
 } = require('../errors/errors');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(OK).send(cards))
-    .catch(() => res.status(ERROR_DEFAULT).send({ message: 'error on server' }));
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   const { _id } = req.user;
   const { name, link } = req.body;
 
@@ -23,70 +22,55 @@ const createCard = (req, res) => {
     .then((card) => res.status(CREATED).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'error on server' });
+        next(BadRequestError('data is incorrect'));
       }
+      next(err);
     });
 };
 
-const deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
-    .orFail(() => new Error('Not Found'))
+const deleteCard = (req, res, next) => {
+  Card.findById(req.params.cardId)
     .then((card) => {
       if (req.user._id !== card.owner.toString()) {
-        res.status(ERROR_CONFLICT).send({ message: 'not your card' });
+        throw new NotAllowedError('not your card');
+      }
+      if (!card) {
+        throw new NotFoundError('we dont have it');
       }
       card.deleteOne()
         .then(() => res.status(OK).send({ message: 'card deleted' }));
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
-      } else if (err.message === 'Not Found') {
-        res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'error on server' });
-      }
-    });
+    .catch(next);
 };
 
-const putLike = (req, res) => {
+const putLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => new Error('Not Found'))
-    .then((card) => res.status(OK).send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
-      } else if (err.message === 'Not Found') {
-        res.status(ERROR_NOT_FOUND).send({ message: 'data is incorrect' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'error on server' });
+    .then((card) => {
+      if (!card) {
+        throw new NotFoundError('we dont have it');
       }
-    });
+      res.status(OK).send(card);
+    })
+    .catch(next);
 };
 
-const deleteLike = (req, res) => {
+const deleteLike = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
-    .orFail(() => new Error('Not Found'))
-    .then((card) => res.status(OK).send(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
-      } else if (err.message === 'Not Found') {
-        res.status(ERROR_NOT_FOUND).send({ message: 'data is incorrect' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'error on server' });
+    .then((card) => {
+      if (!card) {
+        throw new NotFoundError('we dont have it');
       }
-    });
+      res.status(OK).send(card);
+    })
+    .catch(next);
 };
 
 module.exports = {

@@ -1,14 +1,12 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
-
-const { ERROR_NOTAUTH } = require('../errors/errors');
+const NotAuthorizedError = require('../errors/error-not-auth');
 
 const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    res.status(ERROR_NOTAUTH).send({ message: 'not authorized' });
-    next();
+    next(new NotAuthorizedError('not authorized'));
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -17,7 +15,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'super-secret-key');
   } catch (err) {
-    res.status(ERROR_NOTAUTH).send({ message: 'not authorized' });
+    throw new NotAuthorizedError('not authorized');
   }
   req.user = payload;
   next();

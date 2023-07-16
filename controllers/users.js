@@ -3,38 +3,34 @@ const bcrypt = require('bcrypt');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const BadRequestError = require('../errors/error-bad-request');
+const NotFoundError = require('../errors/error-not-found');
+const NotAllowedError = require('../errors/error-not-allowed');
+const NotAuthorizedError = require('../errors/error-not-auth');
 
 const {
-  ERROR_BAD_REQUEST,
-  ERROR_NOT_FOUND,
-  ERROR_DEFAULT,
   OK,
-  ERROR_NOTAUTH,
   CREATED,
 } = require('../errors/errors');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.status(OK).send(users))
-    .catch(() => res.status(ERROR_DEFAULT).send({ message: 'error on server' }));
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params.userId)
-    .orFail(() => new Error('Not Found'))
-    .then((user) => res.status(OK).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
-      } else if (err.message === 'Not Found') {
-        res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'error on server' });
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('we dont have it');
       }
-    });
+      res.status(OK).send(user);
+    })
+    .catch(next);
 };
 
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -43,13 +39,22 @@ const createUser = (req, res) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.status(CREATED).send(user))
+    .then((user) => {
+      res.status(CREATED).send({
+        name: user.name,
+        about: user.about,
+        avatar: user.avatar,
+        email: user.email,
+      });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'error on server' });
+        next(new BadRequestError('data is incorrect'));
+      } if (err.code === 11000) {
+        next(new NotAllowedError('user already exists'));
+        return;
       }
+      next(err);
     });
 };
 
@@ -61,12 +66,12 @@ const login = (req, res, next) => {
       res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
     })
     .catch(() => {
-      res.status(ERROR_NOTAUTH).send({ message: 'not authorized' });
+      throw new NotAuthorizedError('not authorized');
     })
     .catch(next);
 };
 
-const patchUser = (req, res) => {
+const patchUser = (req, res, next) => {
   const { name, about } = req.body;
   const { _id } = req.user;
 
@@ -75,20 +80,17 @@ const patchUser = (req, res) => {
     { name, about },
     { new: true, runValidators: true },
   )
-    .orFail(() => new Error('Not Found'))
     .then((user) => res.status(OK).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
+        next(BadRequestError('data is incorrect'));
       } else if (err.message === 'Not Found') {
-        res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'error on server' });
-      }
+        next(NotFoundError('we dont have it'));
+      } next(err);
     });
 };
 
-const patchAvatar = (req, res) => {
+const patchAvatar = (req, res, next) => {
   const { avatar } = req.body;
   const { _id } = req.user;
 
@@ -97,16 +99,13 @@ const patchAvatar = (req, res) => {
     { avatar },
     { new: true, runValidators: true },
   )
-    .orFail(() => new Error('Not Found'))
     .then((data) => res.status(OK).send(data))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(ERROR_BAD_REQUEST).send({ message: 'data is incorrect' });
+        next(BadRequestError('data is incorrect'));
       } else if (err.message === 'Not Found') {
-        res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
-      } else {
-        res.status(ERROR_DEFAULT).send({ message: 'error on server' });
-      }
+        next(NotFoundError('we dont have it'));
+      } next(err);
     });
 };
 
@@ -114,7 +113,7 @@ const getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
-        res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
+        throw new NotFoundError('we dont have it');
       }
       res.status(OK).send(user);
     })

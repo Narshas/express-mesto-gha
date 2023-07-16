@@ -7,7 +7,7 @@ const userRoutes = require('./users');
 const { login, createUser } = require('../controllers/users');
 const auth = require('../middlewares/auth');
 
-const { ERROR_NOT_FOUND } = require('../errors/errors');
+const NotFoundError = require('../errors/error-not-found');
 
 router.post(
   '/signup',
@@ -39,8 +39,7 @@ router.use('/users', userRoutes);
 router.use(auth);
 
 router.use('*', (req, res, next) => {
-  res.status(ERROR_NOT_FOUND).send('we dont have it');
-  next();
+  next(new NotFoundError('we dont have it'));
 });
 
 module.exports = router;

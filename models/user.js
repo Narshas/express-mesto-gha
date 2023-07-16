@@ -1,7 +1,9 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const mongoose = require('mongoose');
-const validator = require('validator');
+// eslint-disable-next-line import/no-extraneous-dependencies
 const bcrypt = require('bcrypt');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -19,6 +21,11 @@ const userSchema = new mongoose.Schema({
   avatar: {
     type: String,
     default: 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: {
+      validator(v) {
+        return validator.isURL(v);
+      },
+      message: 'is not url',
   },
   email: {
     type: String,
