@@ -5,7 +5,7 @@ const cookieParser = require('cookie-parser');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const mongoose = require('mongoose');
 const router = require('./routes/index');
-const auth = require('./middlewares/auth');
+// const auth = require('./middlewares/auth');
 // const { login, createUser } = require('./controllers/users');
 
 const { PORT = 3000 } = process.env;
@@ -24,7 +24,7 @@ app.use('/', (req, res) => {
 app.use(cookieParser());
 // app.post('/signin', login);
 // app.post('/signup', createUser);
-app.use(auth);
+// app.use(auth);
 
 app.listen(PORT, () => {
   console.log(`server on port ${PORT}`);

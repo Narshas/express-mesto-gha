@@ -26,6 +26,7 @@ const userSchema = new mongoose.Schema({
         return validator.isURL(v);
       },
       message: 'is not url',
+    },
   },
   email: {
     type: String,
