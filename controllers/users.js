@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const BadRequestError = require('../errors/error-bad-request');
 const NotFoundError = require('../errors/error-not-found');
-const NotAllowedError = require('../errors/error-not-allowed');
 const NotAuthorizedError = require('../errors/error-not-auth');
+const ConflictError = require('../errors/error-conflict');
 
 const {
   OK,
@@ -51,7 +51,7 @@ const createUser = (req, res, next) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('data is incorrect'));
       } if (err.code === 11000) {
-        next(new NotAllowedError('user already exists'));
+        next(new ConflictError('user already exists'));
         return;
       }
       next(err);
@@ -63,7 +63,8 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'super-secret-key', { expiresIn: '7d' });
-      res.status(OK).send({ _id: token });
+      // res.status(OK).send({ _id: token });
+      res.cookie('jwt', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
     })
     .catch(() => {
       throw new NotAuthorizedError('not authorized');
