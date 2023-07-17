@@ -63,7 +63,7 @@ const login = (req, res, next) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'super-secret-key', { expiresIn: '7d' });
-      res.cookie('jwt', token, { httpOnly: true, maxAge: 3600000 });
+      res.status(OK).send({ _id: token });
     })
     .catch(() => {
       throw new NotAuthorizedError('not authorized');

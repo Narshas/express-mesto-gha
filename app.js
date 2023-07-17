@@ -10,17 +10,15 @@ const error = require('./middlewares/error');
 const router = require('./routes/index');
 // const auth = require('./middlewares/auth');
 // const { login, createUser } = require('./controllers/users');
+const helmet = require('helmet');
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
 app.use(express.json());
-
+app.use(helmet());
 mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(router);
-// app.use('/', (req, res) => {
-//   res.status(ERROR_NOT_FOUND).send({ message: 'we dont have it' });
-// });
 
 app.use(cookieParser());
 // app.post('/signin', login);
