@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 const express = require('express');
 // eslint-disable-next-line import/no-extraneous-dependencies
-// const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser');
 // eslint-disable-next-line import/no-extraneous-dependencies
 const mongoose = require('mongoose');
 // eslint-disable-next-line import/no-extraneous-dependencies
@@ -18,7 +18,7 @@ const { PORT = 3000 } = process.env;
 const app = express();
 app.use(express.json());
 app.use(helmet());
-// app.use(cookieParser());
+app.use(cookieParser());
 mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(router);
 app.use(errors());
