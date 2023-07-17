@@ -18,10 +18,6 @@ app.use(express.json());
 app.use(helmet());
 mongoose.connect('mongodb://localhost:27017/mestodb');
 app.use(router);
-
-// app.post('/signin', login);
-// app.post('/signup', createUser);
-// app.use(auth);
 app.use(errors());
 app.use(error);
 app.listen(PORT, () => {

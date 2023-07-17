@@ -33,10 +33,9 @@ router.post(
   }),
   login,
 );
-
+router.use(auth);
 router.use('/cards', cardRoutes);
 router.use('/users', userRoutes);
-router.use(auth);
 
 router.use('*', (req, res, next) => {
   next(new NotFoundError('we dont have it'));

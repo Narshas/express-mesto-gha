@@ -73,14 +73,13 @@ const login = (req, res, next) => {
 
 const patchUser = (req, res, next) => {
   const { name, about } = req.body;
-  const { _id } = req.user;
 
   User.findByIdAndUpdate(
-    { _id },
+    req.user._id,
     { name, about },
     { new: true, runValidators: true },
   )
-    .then((user) => res.status(OK).send(user))
+    .then((user) => { res.status(OK).send(user); })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(BadRequestError('data is incorrect'));
@@ -92,14 +91,13 @@ const patchUser = (req, res, next) => {
 
 const patchAvatar = (req, res, next) => {
   const { avatar } = req.body;
-  const { _id } = req.user;
 
   User.findByIdAndUpdate(
-    { _id },
+    req.user._id,
     { avatar },
     { new: true, runValidators: true },
   )
-    .then((data) => res.status(OK).send(data))
+    .then((data) => { res.status(OK).send(data); })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(BadRequestError('data is incorrect'));
