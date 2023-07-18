@@ -13,21 +13,10 @@ const {
 
 } = require('../controllers/users');
 
-router.get('/users', getUsers);
-router.get(
-  '/users/:userId',
-  celebrate({
-    params: Joi.object().keys({
-      userId: Joi.string().length(24).hex().required(),
-    }),
-  }),
-  getUserById,
-);
-
 router.post('/', createUser);
 
 router.patch(
-  '/users/me',
+  '/me',
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
@@ -38,7 +27,7 @@ router.patch(
 );
 
 router.patch(
-  '/users/me/avatar',
+  '/me/avatar',
   celebrate({
     body: Joi.object().keys({
       avatar: Joi.string().required().pattern(/(https)?:\/\/(www\.)?[a-z0-9\-._~:/?#[\]@!$&'()*+,;=]{2,}\.[a-z0-9/#?]{2,}$/),
@@ -47,6 +36,16 @@ router.patch(
   patchAvatar,
 );
 
-router.get('/users/me', getCurrentUser);
+router.get('/me', getCurrentUser);
+router.get('/', getUsers);
+router.get(
+  '/:userId',
+  celebrate({
+    params: Joi.object().keys({
+      userId: Joi.string().length(24).hex().required(),
+    }),
+  }),
+  getUserById,
+);
 
 module.exports = router;
