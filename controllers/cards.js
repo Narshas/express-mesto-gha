@@ -30,11 +30,11 @@ const createCard = (req, res, next) => {
 const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .then((card) => {
-      if (req.user._id !== card.owner.toString()) {
-        throw new NotAllowedError('not your card');
-      }
       if (!card) {
         throw new NotFoundError('we dont have it');
+      }
+      if (req.user._id !== card.owner.toString()) {
+        throw new NotAllowedError('not your card');
       }
       card.deleteOne()
         .then(() => res.status(OK).send({ message: 'card deleted' }));
