@@ -36,7 +36,7 @@ const deleteCard = (req, res, next) => {
       if (req.user._id !== card.owner.toString()) {
         throw new NotAllowedError('not your card');
       }
-      card.deleteOne()
+      return card.deleteOne()
         .then(() => res.status(OK).send({ message: 'card deleted' }));
     })
     .catch(next);

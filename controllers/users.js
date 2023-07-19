@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const BadRequestError = require('../errors/error-bad-request');
 const NotFoundError = require('../errors/error-not-found');
-const NotAuthorizedError = require('../errors/error-not-auth');
+// const NotAuthorizedError = require('../errors/error-not-auth');
 const ConflictError = require('../errors/error-conflict');
 
 const {
@@ -50,11 +50,11 @@ const createUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new BadRequestError('data is incorrect'));
-      } if (err.code === 11000) {
+      } else if (err.code === 11000) {
         next(new ConflictError('user already exists'));
-        return;
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -66,9 +66,9 @@ const login = (req, res, next) => {
       res.status(OK).send({ _id: token });
       // res.cookie('jwt', token, { httpOnly: true, maxAge: 7 * 24 * 60 * 60 * 1000 });
     })
-    .catch(() => {
-      throw new NotAuthorizedError('not authorized');
-    })
+    // .catch(() => {
+    //   throw new NotAuthorizedError('not authorized');
+    // })
     .catch(next);
 };
 
@@ -80,13 +80,18 @@ const patchUser = (req, res, next) => {
     { name, about },
     { new: true, runValidators: true },
   )
-    .then((user) => { res.status(OK).send(user); })
+    .then((user) => {
+      if (!user) {
+        throw new NotFoundError('we dont have it');
+      }
+      res.status(OK).send(user);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(BadRequestError('data is incorrect'));
-      } else if (err.message === 'Not Found') {
-        next(NotFoundError('we dont have it'));
-      } next(err);
+        next(new BadRequestError('data is incorrect'));
+      } else {
+        next(err);
+      }
     });
 };
 
@@ -98,13 +103,18 @@ const patchAvatar = (req, res, next) => {
     { avatar },
     { new: true, runValidators: true },
   )
-    .then((data) => { res.status(OK).send(data); })
+    .then((data) => {
+      if (!data) {
+        throw new NotFoundError('we dont have it');
+      }
+      res.status(OK).send(data);
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(BadRequestError('data is incorrect'));
-      } else if (err.message === 'Not Found') {
-        next(NotFoundError('we dont have it'));
-      } next(err);
+        next(new BadRequestError('data is incorrect'));
+      } else {
+        next(err);
+      }
     });
 };
 

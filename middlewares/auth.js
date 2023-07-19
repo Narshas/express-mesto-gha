@@ -7,6 +7,7 @@ const auth = (req, res, next) => {
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
     next(new NotAuthorizedError('not authorized'));
+    return;
   }
 
   const token = authorization.replace('Bearer ', '');
@@ -15,7 +16,8 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'super-secret-key');
   } catch (err) {
-    throw new NotAuthorizedError('not authorized');
+    next(new NotAuthorizedError('not authorized'));
+    return;
   }
   req.user = payload;
   next();
