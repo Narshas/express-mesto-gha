@@ -11,7 +11,7 @@ const { errors } = require('celebrate');
 const error = require('./middlewares/error');
 const router = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const { cors } = require('./middlewares/cors');
+// const { cors } = require('./middlewares/cors');
 
 const { PORT = 3000 } = process.env;
 
@@ -26,7 +26,7 @@ app.use(router);
 app.use(errorLogger);
 app.use(errors());
 app.use(error);
-app.use(cors);
+// app.use(cors);
 app.listen(PORT, () => {
   console.log(`server on port ${PORT}`);
 });
